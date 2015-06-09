@@ -298,28 +298,6 @@ module.exports = function(options) {
 }
 
 
-
-function fixquery(qent,q) {
-  var qq = {};
-
-  if( !q.native$ ) {
-    for( var qp in q ) {
-      if( !qp.match(/\$$/) ) {
-        qq[qp] = q[qp]
-      }
-    }
-    if( qq.id ) {
-      qq._id = makeid(qq.id)
-      delete qq.id
-    }
-  }
-  else {
-    qq = _.isArray(q.native$) ? q.native$[0] : q.native$
-  }
-
-  return qq
-}
-
 function makeKeyId(ent, id) {
   var canon = ent.canon$({object: true})
 
