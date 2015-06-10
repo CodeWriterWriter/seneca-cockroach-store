@@ -8,7 +8,7 @@ var roach = require('roachjs')
 
 
 module.exports = function(options) {
-
+  var KEY_LENGTH = 20
 
   var seneca = this
   var desc
@@ -39,6 +39,24 @@ module.exports = function(options) {
     cb(null)
   }
 
+  function generateId(ent, cb)
+  {
+    var canon = ent.canon$({object: true})
+
+    var incKey = (canon.base ? canon.base + '_' : '') + canon.name + '_keyrange'
+
+    dbinst.increment(incKey, 1, function(err, newValue, res) {
+      var newId = makeId(newValue)
+
+      cb(err, newId)
+    })
+  }
+
+  function makeId(id)
+  {
+    id = id + ''
+    return new Array(KEY_LENGTH - id.length + 1).join("0") + id
+  }
 
   var store = {
 
@@ -55,11 +73,18 @@ module.exports = function(options) {
       if (!update) {
         ent.id = void 0 != ent.id$ ? ent.id$ : -1;
 
-
         delete(ent.id$)
 
         if (ent.id === -1) {
-          this.act({role:'util', cmd:'generate_id',
+          generateId(ent, function(err, newId){
+            if (err) return cb(err);
+
+            ent.id = newId
+
+            completeSave(newId)
+          })
+
+/*          this.act({role:'util', cmd:'generate_id',
                     name:canon.name, base:canon.base, zone:canon.zone, length: 10 },
                     function(err,id){
                         if (err) return cb(err);
@@ -68,7 +93,7 @@ module.exports = function(options) {
 
                         completeSave(id)
                     }
-          )
+          )*/
         }
         else {
           completeSave(ent.id)
@@ -137,8 +162,8 @@ module.exports = function(options) {
 
       var qq = fixquery(qent,q)
 
-      var startKey = makeKeyId(qent, new Array(11).join("0"))
-      var endKey = makeKeyId(qent, new Array(11).join("z"))
+      var startKey = makeKeyId(qent, makeId("0"))
+      var endKey = makeKeyId(qent, makeId("9"))
 
       var list = []
 
@@ -196,8 +221,8 @@ module.exports = function(options) {
       var qq = fixquery(qent, q)
 
       if (all) {
-        var startKey = makeKeyId(qent, new Array(11).join("0"))
-        var endKey = makeKeyId(qent, new Array(11).join("z"))
+        var startKey = makeKeyId(qent, makeId("0"))
+        var endKey = makeKeyId(qent, makeId("9"))
 
         dbinst.deleteRange(startKey, endKey, 0, function(err, deleted, result){
           if (!error(args, err, cb))
