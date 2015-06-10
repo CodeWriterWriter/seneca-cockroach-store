@@ -14,6 +14,8 @@ module.exports = function(options) {
   var desc
   var dbinst = null
 
+  var name = "cockroach-store"
+
   function error(args,err,cb) {
     if (err) {
       seneca.log.error('entity',err,{store:name})
@@ -29,9 +31,6 @@ module.exports = function(options) {
     var dbOpts = seneca.util.deepextend({
       uri:"http://localhost:8080",
     },spec.options)
-
-    if (!dbOpts.ssl)
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
     dbinst = new roach(dbOpts)
 
@@ -55,6 +54,8 @@ module.exports = function(options) {
 
       if (!update) {
         ent.id = void 0 != ent.id$ ? ent.id$ : -1;
+
+
         delete(ent.id$)
 
         if (ent.id === -1) {
@@ -68,6 +69,9 @@ module.exports = function(options) {
                         completeSave(id)
                     }
           )
+        }
+        else {
+          completeSave(ent.id)
         }
       }
       else
@@ -219,7 +223,6 @@ module.exports = function(options) {
                   {
                     seneca.log.debug('remove/one', q, data, desc)
 
-                    console.log("loaded is " + load)
                     var ent = load ? data : null
                     cb(err,ent)
                   }

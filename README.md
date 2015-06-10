@@ -29,9 +29,7 @@ Tested on: Node 0.10.38, Seneca 0.6.1
 ```JavaScript
 var seneca = require('seneca')()
 seneca.use('cockroach-store',{
-  host:'127.0.0.1',
-  port:8080,
-  ssl: false
+  uri:'https://127.0.0.1:8080'
 })
 
 seneca.ready(function(){
@@ -44,6 +42,11 @@ seneca.ready(function(){
 })
 ```
 
+If using self signed certs and you're seeing 'UNABLE_TO_VERIFY_LEAF_SIGNATURE' errors then you can disable the verification checks using the line below. Add this line before connecting to the Cockroach DB.
+
+NOTE: This should only be done in a development environment, for production you should ensure you certificate keychain has all relevant certs.
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 ## Install
 
@@ -81,7 +84,6 @@ The standard Seneca query format is supported:
    * `entity.list$({f1:v1,...},{skip$:5})` means skip the first 5
    * `entity.list$({f1:v1,...},{fields$:['field1','field2']})` means only return the listed fields (avoids pulling lots of data out of the database)
    * you can use sort$, limit$, skip$ and fields$ together
-   * `entity.list$({f1:v1,...},{native$:[{-mongo-query-},{-mongo-options-}]})` allows you to specify a native mongo query, as per [node-mongodb-native](http://mongodb.github.com/node-mongodb-native/markdown-docs/queries.html)
 
 
 ### Native Driver
@@ -94,5 +96,5 @@ the `roachjs` `client` object using `entity.native$(function(err,collection){...
 
 ```bash
 cd test
-mocha mongo.test.js --seneca.log.print
+mocha cockroach.test.js --seneca.log.print
 ```
