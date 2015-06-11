@@ -1,6 +1,6 @@
 {
   "name": "seneca-cockroach-store",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A seneca data store plugin for CockroachDB ",
   "main": "cockroach-store",
   "scripts": {
@@ -22,11 +22,6 @@
   "bugs": {
     "url": "https://github.com/colmharte/seneca-cockroach-store/issues"
   },
-  "files": [
-    "LICENSE.txt",
-    "README.md",
-    "cockroach-store"
-  ],
   "homepage": "https://github.com/colmharte/seneca-cockroach-store",
   "dependencies": {
     "lodash": "^3.9.3",
